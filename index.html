@@ -43,10 +43,10 @@ header.top{display:flex;justify-content:space-between;align-items:flex-end;margi
 header.top h1{font-size:21px;margin:0;font-weight:900;}
 header.top .date{color:var(--ink-soft);font-size:13px;}
 
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
 .card{background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;padding:13px 16px;}
 .card .label{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
-.card .value{font-size:25px;font-weight:900;line-height:1;}
+.card .value{font-size:23px;font-weight:900;line-height:1;}
 .card.alert .value{color:var(--danger);}
 .card.warn .value{color:var(--warn);}
 .card.ok .value{color:var(--ok);}
@@ -71,7 +71,6 @@ header.top .date{color:var(--ink-soft);font-size:13px;}
 }
 .btn:hover{background:#324150;}
 
-/* ---- compact urgency legend ---- */
 .legend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;flex-wrap:wrap;}
 .legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
 .legend .d-danger{background:var(--danger);}
@@ -80,7 +79,6 @@ header.top .date{color:var(--ink-soft);font-size:13px;}
 .legend .d-ok{background:var(--ok);}
 .legend span.note{margin-left:auto;font-size:11.5px;}
 
-/* ---- compact property cards ---- */
 .prop-card{background:var(--paper-raised);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:9px;margin-bottom:7px;}
 .prop-card.pc-danger{border-left-color:var(--danger);}
 .prop-card.pc-warn{border-left-color:var(--warn);}
@@ -125,7 +123,6 @@ details.pc-detail[open] summary::before{content:'詳細を閉じる ▾ ';}
 
 .empty{padding:30px;text-align:center;color:var(--ink-soft);font-size:13.5px;background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;}
 
-/* ---- chakuden / cs ---- */
 table{width:100%;border-collapse:collapse;background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
 thead th{text-align:left;font-size:11.5px;color:var(--ink-soft);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--neutral-bg);}
 tbody td{padding:11px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
@@ -186,16 +183,15 @@ tbody tr:last-child td{border-bottom:none;}
 
     <div class="summary" id="summaryCards"></div>
 
-    <!-- エリマネ案件 -->
     <section class="section active" id="tab-eriman">
-      <p class="desc">物件名と報告期限を入れるだけで、依頼確認→現地確認→役所調査→資料まとめ・保存→報告の目安日を自動で割り振ります。緊急度が高い（期限が近い・過ぎている）様邸ほど自動で上に並びます。</p>
+      <p class="desc">物件名と報告期限を入れるだけで各ステップの目安日を自動算出。緊急度が高い案件ほど自動で上に並びます。</p>
 
       <div class="form-row">
         <div class="grid">
           <div><label>物件名・顧客名</label><input id="f-property" placeholder="例：山田様邸"></div>
           <div><label>依頼者(エリマネ)</label><input id="f-requester" placeholder="例：田中エリマネ"></div>
           <div><label>報告期限</label><input id="f-deadline" type="date"></div>
-          <div><label>依頼内容・メモ（任意）</label><input id="f-content" placeholder="例：役所へ電話、資料を郵送、〇〇へ確認"></div>
+          <div><label>依頼内容・メモ（任意）</label><input id="f-content" placeholder="例：役所へ電話、資料を郵送"></div>
           <div><button class="btn" id="addErimanBtn">追加</button></div>
         </div>
         <div class="form-hint">依頼内容・メモは「、」で区切ると、それぞれ個別のチェック項目として表示されます。</div>
@@ -206,14 +202,13 @@ tbody tr:last-child td{border-bottom:none;}
         <span><span class="dot d-warn"></span>3日以内</span>
         <span><span class="dot d-neutral"></span>余裕あり</span>
         <span><span class="dot d-ok"></span>完了</span>
-        <span class="note">チップをクリックでチェックのON/OFF、「詳細を編集」で日付調整</span>
+        <span class="note">「詳細を編集」で物件名・依頼者・期限・日付を変更できます</span>
       </div>
 
       <div id="erimanCards"></div>
       <div class="empty" id="erimanEmpty" style="display:none;">まだ案件が登録されていません。上のフォームから追加してください。</div>
     </section>
 
-    <!-- 集客(架電) -->
     <section class="section" id="tab-chakuden">
       <p class="desc">架電の目標は本数ではなく「月2件の集客」です。実績を記録し、当月の到達状況を確認できます。</p>
 
@@ -235,7 +230,6 @@ tbody tr:last-child td{border-bottom:none;}
       <div class="empty" id="chakudenEmpty" style="display:none;">今月の集客実績はまだありません。</div>
     </section>
 
-    <!-- CS -->
     <section class="section" id="tab-cs">
       <p class="desc">銀行業務などCS対応のタスクをチェックリストで管理します。</p>
 
@@ -252,7 +246,7 @@ tbody tr:last-child td{border-bottom:none;}
       <div class="empty" id="csEmpty" style="display:none;">CSタスクはまだありません。</div>
     </section>
 
-    <div class="saved-note" id="savedNote">読み込み中…</div>
+    <div class="saved-note" id="savedNote">データ保存状態を確認中…</div>
     <div class="backup-row">
       <button class="mini-btn" id="exportBtn">バックアップを書き出す（.json）</button>
       <button class="mini-btn" id="importBtn">バックアップを読み込む</button>
@@ -262,7 +256,7 @@ tbody tr:last-child td{border-bottom:none;}
 </div>
 
 <script>
-const STORAGE_KEY = 'kaga-dashboard-data';
+const STORAGE_KEY = 'kaga-dashboard-local-data';
 let data = { erimanTasks: [], chakudenLog: [], csTasks: [] };
 
 const STEP_TEMPLATE = [
@@ -307,62 +301,37 @@ function computeSteps(createdDate, deadline){
   });
 }
 
-async function loadData(){
-  let res = null;
-  try{
-    res = await window.storage.get(STORAGE_KEY, true);
-  }catch(e){
-    console.log('共有データの読み込みなし、個人データを確認します', e);
-    try{
-      res = await window.storage.get(STORAGE_KEY, false);
-    }catch(e2){
-      console.log('個人データもなし（初回起動の可能性）', e2);
-    }
-  }
-  try{
-    if(res && res.value){
-      const parsed = JSON.parse(res.value);
+// --- ローカル自動保存・読み込み ---
+function loadData(){
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
       data = Object.assign({ erimanTasks:[], chakudenLog:[], csTasks:[] }, parsed);
       data.erimanTasks.forEach(t=>{
         if(!t.steps){
           t.createdDate = t.createdDate || todayISO();
           t.steps = computeSteps(t.createdDate, t.deadline);
-          if(t.status==='報告済み'){ t.steps.forEach(s=>{ s.done=true; s.doneDate = t.reportedDate || todayISO(); }); }
         }
         t.steps.forEach(s=>{ if(!s.short){ const tpl = STEP_TEMPLATE.find(x=>x.key===s.key); s.short = tpl ? tpl.short : s.label; } });
         if(!t.memoItems){ t.memoItems = parseMemoItems(t.content); }
       });
     }
+    document.getElementById('savedNote').textContent = '端末への保存準備完了';
   }catch(e){
-    console.error('データの読み込みに失敗しました', e);
+    console.error('データの読み込み失敗:', e);
   }
   render();
 }
 
-async function saveData(){
+function saveData(){
   document.getElementById('savedNote').textContent = '保存中…';
-  // まず共有保存(shared)を試す。失敗したら自分のみの保存(personal)にフォールバックする。
-  try{
-    const r = await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
-    if(r){
-      document.getElementById('savedNote').textContent = '保存済み（このダッシュボードを開いた全員に共有されます） ・ ' + new Date().toLocaleTimeString('ja-JP');
-      return;
-    }
-    throw new Error('共有保存がnullを返しました');
-  }catch(sharedErr){
-    console.warn('共有保存に失敗、個人保存を試みます', sharedErr);
-    try{
-      const r2 = await window.storage.set(STORAGE_KEY, JSON.stringify(data), false);
-      if(r2){
-        document.getElementById('savedNote').innerHTML = '共有保存に失敗したため、あなたの端末のみに保存しました（他の人には共有されません）。定期的に下の「バックアップを書き出す」もご利用ください。 ・ ' + new Date().toLocaleTimeString('ja-JP');
-        return;
-      }
-      throw new Error('個人保存もnullを返しました');
-    }catch(personalErr){
-      const msg = (personalErr && personalErr.message) ? personalErr.message : String(personalErr);
-      document.getElementById('savedNote').innerHTML = `自動保存に失敗しました（エラー: ${escapeHtml(msg)}）。データが消えないよう、下の「バックアップを書き出す」ボタンで手元に保存してください。`;
-      console.error('保存エラー(共有/個人とも失敗):', sharedErr, personalErr);
-    }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    document.getElementById('savedNote').textContent = '保存済み（この端末に記憶されました） ・ ' + new Date().toLocaleTimeString('ja-JP');
+  } catch(err){
+    console.error('保存エラー:', err);
+    document.getElementById('savedNote').textContent = '保存に失敗しました';
   }
 }
 
@@ -384,7 +353,6 @@ function isAllDone(task){ return task.steps.every(s=>s.done); }
 function nextPendingStep(task){ return task.steps.find(s=>!s.done) || null; }
 
 function urgencyRank(task){
-  // 0 = overdue (most urgent), 1 = due within 3 days, 2 = normal, 3 = all done
   if(isAllDone(task)) return 3;
   const np = nextPendingStep(task);
   const d = daysUntil(np ? np.date : task.deadline);
@@ -395,17 +363,21 @@ function urgencyRank(task){
 }
 
 function renderSummary(){
+  const totalEriman = data.erimanTasks.length;
   const overdueProps = data.erimanTasks.filter(t=> urgencyRank(t)===0).length;
   const soonProps = data.erimanTasks.filter(t=> urgencyRank(t)===1).length;
-  const unreported = data.erimanTasks.filter(t=> !isAllDone(t)).length;
+  const doneProps = data.erimanTasks.filter(t=> isAllDone(t)).length;
+  const completionRate = totalEriman > 0 ? Math.round((doneProps / totalEriman) * 100) : 0;
+
   const thisMonth = todayISO().slice(0,7);
   const monthCount = data.chakudenLog.filter(c=> c.date && c.date.slice(0,7)===thisMonth).length;
 
   const cards = [
-    { label:'期限超過（様邸）', value: overdueProps, cls: overdueProps>0?'alert':'ok', sub: overdueProps>0 ? 'すぐに確認してください' : '超過なし' },
-    { label:'報告まで3日以内', value: soonProps, cls: soonProps>0?'warn':'', sub: '要注意ライン' },
-    { label:'未報告の件数', value: unreported, cls: unreported>0?'warn':'ok', sub: '報告完了以外の合計' },
-    { label:'今月の集客実績', value: `${monthCount} / 2`, cls: monthCount>=2 ? 'ok' : (monthCount>=1?'warn':'alert'), sub: '目標：月2件' },
+    { label:'期限超過（危険）', value: overdueProps, cls: overdueProps>0?'alert':'ok', sub: overdueProps>0 ? '至急対応が必要です' : '現在ゼロ件' },
+    { label:'3日以内（注意）', value: soonProps, cls: soonProps>0?'warn':'', sub: '今日〜近々のタスク' },
+    { label:'未完了案件', value: totalEriman - doneProps, cls: (totalEriman - doneProps)>0?'warn':'ok', sub: `全${totalEriman}件中` },
+    { label:'案件完了率（解析）', value: `${completionRate}%`, cls: completionRate>=80?'ok':(completionRate>=50?'warn':''), sub: `${doneProps}件 報告済み` },
+    { label:'今月集客実績', value: `${monthCount} / 2`, cls: monthCount>=2 ? 'ok' : (monthCount>=1?'warn':'alert'), sub: '目標：月2件' },
   ];
   document.getElementById('summaryCards').innerHTML = cards.map(c=>`
     <div class="card ${c.cls}">
@@ -414,7 +386,7 @@ function renderSummary(){
       <div class="sub">${c.sub}</div>
     </div>`).join('');
 
-  document.getElementById('sideTally').textContent = `エリマネ案件 ${data.erimanTasks.length}件 ／ CS ${data.csTasks.filter(t=>!t.done).length}件未完了`;
+  document.getElementById('sideTally').textContent = `エリマネ案件 ${totalEriman}件 ／ CS ${data.csTasks.filter(t=>!t.done).length}件未完了`;
 }
 
 function stepChipClass(step){
@@ -488,7 +460,9 @@ function renderEriman(){
       <details class="pc-detail">
         <summary></summary>
         <div class="detail-body">
-          <div class="detail-row"><div class="dr-label">依頼内容・メモ</div><input type="text" class="content-input" data-id="${t.id}" value="${escapeHtml(t.content||'')}" placeholder="例：役所へ電話、資料を郵送、〇〇へ確認"></div>
+          <div class="detail-row"><div class="dr-label">物件名・顧客名</div><input type="text" class="property-input" data-id="${t.id}" value="${escapeHtml(t.property||'')}"></div>
+          <div class="detail-row"><div class="dr-label">依頼者(エリマネ)</div><input type="text" class="requester-input" data-id="${t.id}" value="${escapeHtml(t.requester||'')}"></div>
+          <div class="detail-row"><div class="dr-label">依頼内容・メモ</div><input type="text" class="content-input" data-id="${t.id}" value="${escapeHtml(t.content||'')}" placeholder="例：役所へ電話、資料を郵送"></div>
           <div class="detail-row"><div class="dr-label">報告期限</div><input type="date" class="deadline-input" data-id="${t.id}" value="${t.deadline||''}"></div>
           ${t.steps.map(s=>`
             <div class="detail-row"><div class="dr-label">${escapeHtml(s.label)}の目安日</div><input type="date" class="step-date-input" data-id="${t.id}" data-step="${s.key}" value="${s.date||''}"></div>
@@ -517,6 +491,20 @@ function renderEriman(){
       const task = data.erimanTasks.find(t=>t.id===btn.dataset.id);
       const idx = Number(btn.dataset.memoIdx);
       task.memoItems[idx].done = !task.memoItems[idx].done;
+      saveData(); render();
+    });
+  });
+  wrap.querySelectorAll('.property-input').forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      const task = data.erimanTasks.find(t=>t.id===e.target.dataset.id);
+      task.property = e.target.value;
+      saveData(); render();
+    });
+  });
+  wrap.querySelectorAll('.requester-input').forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      const task = data.erimanTasks.find(t=>t.id===e.target.dataset.id);
+      task.requester = e.target.value;
       saveData(); render();
     });
   });
@@ -704,7 +692,7 @@ document.getElementById('importFile').addEventListener('change', e=>{
       });
       saveData(); render();
     }catch(err){
-      alert('このファイルは読み込めませんでした。書き出したバックアップファイルを指定してください。');
+      alert('このファイルは読み込めませんでした。');
       console.error(err);
     }
   };
