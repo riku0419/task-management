@@ -109,12 +109,15 @@ header.top .date{color:var(--ink-soft);font-size:13px;}
 
 /* コメント欄スタイル */
 .comment-section{padding:4px 13px 10px;border-top:1px dashed var(--line);margin-top:6px;}
-.comment-list{max-height:140px;overflow-y:auto;margin-bottom:8px;}
-.comment-item{font-size:12px;color:var(--ink);background:#F9F8F3;border:1px solid #EAE6DB;padding:5px 9px;border-radius:6px;margin-top:4px;display:flex;justify-content:space-between;align-items:flex-start;}
-.comment-item .c-time{font-size:10.5px;color:var(--ink-soft);margin-right:8px;white-space:nowrap;}
+.comment-list{max-height:160px;overflow-y:auto;margin-bottom:8px;}
+.comment-item{font-size:12px;color:var(--ink);background:#F9F8F3;border:1px solid #EAE6DB;padding:5px 9px;border-radius:6px;margin-top:4px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
+.comment-item .c-time{font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
 .comment-item .c-text{flex:1;word-break:break-all;}
-.comment-item .c-del{all:unset;cursor:pointer;color:var(--danger);font-size:11px;margin-left:6px;opacity:0.6;}
-.comment-item .c-del:hover{opacity:1;}
+.comment-item .c-edit-input{flex:1;font-size:12px;padding:2px 6px;border:1px solid var(--line);border-radius:4px;background:#fff;}
+.comment-actions{display:flex;gap:4px;align-items:center;}
+.c-btn{all:unset;cursor:pointer;font-size:11px;padding:1px 5px;border-radius:3px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);}
+.c-btn:hover{background:var(--neutral-bg);color:var(--ink);}
+.c-btn.c-del{color:var(--danger);border-color:var(--danger-bg);}
 .comment-form{display:flex;gap:6px;}
 .comment-input{flex:1;padding:5px 8px;border:1px solid var(--line);border-radius:5px;background:#FCFBF8;font-size:12px;font-family:inherit;}
 .comment-add-btn{all:unset;cursor:pointer;background:var(--ink-soft);color:#fff;padding:4px 12px;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;}
@@ -197,7 +200,7 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="summary" id="summaryCards"></div>
 
     <section class="section active" id="tab-eriman">
-      <p class="desc">物件名と報告期限を入れるだけで各ステップの目安日を自動算出。各カードでコメントを時系列に残せます。</p>
+      <p class="desc">物件名と報告期限を入れるだけで各ステップの目安日を自動算出。コメントの追加・編集も可能です。</p>
 
       <div class="form-row">
         <div class="grid">
@@ -475,10 +478,21 @@ function renderEriman(){
       <div class="comment-section">
         <div class="comment-list">
           ${(t.comments && t.comments.length) ? t.comments.map((c, idx)=>`
-            <div class="comment-item">
+            <div class="comment-item" data-id="${t.id}" data-c-idx="${idx}">
               <span class="c-time">${escapeHtml(c.time)}</span>
-              <span class="c-text">${escapeHtml(c.text)}</span>
-              <button class="c-del" data-id="${t.id}" data-c-idx="${idx}" title="削除">✕</button>
+              ${c.isEditing ? `
+                <input type="text" class="c-edit-input" value="${escapeHtml(c.text)}">
+                <div class="comment-actions">
+                  <button class="c-btn c-save" data-id="${t.id}" data-c-idx="${idx}">保存</button>
+                  <button class="c-btn c-cancel" data-id="${t.id}" data-c-idx="${idx}">取消</button>
+                </div>
+              ` : `
+                <span class="c-text">${escapeHtml(c.text)}</span>
+                <div class="comment-actions">
+                  <button class="c-btn c-edit" data-id="${t.id}" data-c-idx="${idx}">編集</button>
+                  <button class="c-btn c-del" data-id="${t.id}" data-c-idx="${idx}">✕</button>
+                </div>
+              `}
             </div>
           `).join('') : '<div style="font-size:11px;color:var(--ink-soft);padding:2px 0;">メモ・コメント履歴はありません</div>'}
         </div>
@@ -537,7 +551,7 @@ function renderEriman(){
     if(!task.comments) task.comments = [];
     const now = new Date();
     const timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    task.comments.push({ text: text, time: timeStr });
+    task.comments.push({ text: text, time: timeStr, isEditing: false });
     saveData(); render();
   };
 
@@ -554,6 +568,43 @@ function renderEriman(){
       if(e.key === 'Enter'){
         handleAddComment(e.currentTarget.dataset.id, e.currentTarget);
       }
+    });
+  });
+
+  // コメント編集開始
+  wrap.querySelectorAll('.c-edit').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const taskId = e.currentTarget.dataset.id;
+      const cIdx = Number(e.currentTarget.dataset.cIdx);
+      const task = data.erimanTasks.find(t=>t.id===taskId);
+      task.comments[cIdx].isEditing = true;
+      render();
+    });
+  });
+
+  // コメント保存
+  wrap.querySelectorAll('.c-save').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const taskId = e.currentTarget.dataset.id;
+      const cIdx = Number(e.currentTarget.dataset.cIdx);
+      const itemEl = e.currentTarget.closest('.comment-item');
+      const newText = itemEl.querySelector('.c-edit-input').value.trim();
+      if(!newText) return;
+      const task = data.erimanTasks.find(t=>t.id===taskId);
+      task.comments[cIdx].text = newText;
+      task.comments[cIdx].isEditing = false;
+      saveData(); render();
+    });
+  });
+
+  // コメント編集キャンセル
+  wrap.querySelectorAll('.c-cancel').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const taskId = e.currentTarget.dataset.id;
+      const cIdx = Number(e.currentTarget.dataset.cIdx);
+      const task = data.erimanTasks.find(t=>t.id===taskId);
+      task.comments[cIdx].isEditing = false;
+      render();
     });
   });
 
