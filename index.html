@@ -79,7 +79,7 @@ header.top .date{color:var(--ink-soft);font-size:13px;}
 .legend .d-ok{background:var(--ok);}
 .legend span.note{margin-left:auto;font-size:11.5px;}
 
-.prop-card{background:var(--paper-raised);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:9px;margin-bottom:7px;}
+.prop-card{background:var(--paper-raised);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:9px;margin-bottom:10px;padding-bottom:6px;}
 .prop-card.pc-danger{border-left-color:var(--danger);}
 .prop-card.pc-warn{border-left-color:var(--warn);}
 .prop-card.pc-done{opacity:.6;}
@@ -107,16 +107,29 @@ header.top .date{color:var(--ink-soft);font-size:13px;}
 .step-chip.sc-done .chk{background:currentColor;}
 .step-chip.sc-done .chk::after{content:'✓';color:#fff;}
 
-details.pc-detail{padding:0 13px 11px;}
+/* コメント欄スタイル */
+.comment-section{padding:4px 13px 10px;border-top:1px dashed var(--line);margin-top:6px;}
+.comment-list{max-height:140px;overflow-y:auto;margin-bottom:8px;}
+.comment-item{font-size:12px;color:var(--ink);background:#F9F8F3;border:1px solid #EAE6DB;padding:5px 9px;border-radius:6px;margin-top:4px;display:flex;justify-content:space-between;align-items:flex-start;}
+.comment-item .c-time{font-size:10.5px;color:var(--ink-soft);margin-right:8px;white-space:nowrap;}
+.comment-item .c-text{flex:1;word-break:break-all;}
+.comment-item .c-del{all:unset;cursor:pointer;color:var(--danger);font-size:11px;margin-left:6px;opacity:0.6;}
+.comment-item .c-del:hover{opacity:1;}
+.comment-form{display:flex;gap:6px;}
+.comment-input{flex:1;padding:5px 8px;border:1px solid var(--line);border-radius:5px;background:#FCFBF8;font-size:12px;font-family:inherit;}
+.comment-add-btn{all:unset;cursor:pointer;background:var(--ink-soft);color:#fff;padding:4px 12px;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;}
+.comment-add-btn:hover{background:var(--ink);}
+
+details.pc-detail{padding:0 13px 8px;}
 details.pc-detail summary{cursor:pointer;font-size:11.5px;color:var(--accent);list-style:none;user-select:none;}
 details.pc-detail summary::-webkit-details-marker{display:none;}
 details.pc-detail summary::before{content:'詳細を編集 ▸ ';}
 details.pc-detail[open] summary::before{content:'詳細を閉じる ▾ ';}
-.detail-body{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
-.detail-row{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px;}
+.detail-body{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);}
+.detail-row{display:flex;align-items:center;gap:10px;padding:4px 0;font-size:12.5px;}
 .detail-row .dr-label{width:130px;flex-shrink:0;color:var(--ink-soft);}
 .detail-row input[type=date],.detail-row input[type=text]{border:1px solid var(--line);background:#FCFBF8;border-radius:5px;padding:4px 7px;font-size:12.5px;font-family:inherit;color:var(--ink);flex:1;}
-.detail-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end;}
+.detail-actions{display:flex;gap:8px;margin-top:8px;justify-content:flex-end;}
 .mini-btn{all:unset;cursor:pointer;font-size:11px;color:var(--ink-soft);padding:4px 10px;border:1px solid var(--line);border-radius:5px;}
 .mini-btn:hover{background:var(--neutral-bg);color:var(--ink);}
 .mini-btn.mb-danger{color:var(--danger);border-color:var(--danger);}
@@ -184,7 +197,7 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="summary" id="summaryCards"></div>
 
     <section class="section active" id="tab-eriman">
-      <p class="desc">物件名と報告期限を入れるだけで各ステップの目安日を自動算出。緊急度が高い案件ほど自動で上に並びます。</p>
+      <p class="desc">物件名と報告期限を入れるだけで各ステップの目安日を自動算出。各カードでコメントを時系列に残せます。</p>
 
       <div class="form-row">
         <div class="grid">
@@ -202,7 +215,7 @@ tbody tr:last-child td{border-bottom:none;}
         <span><span class="dot d-warn"></span>3日以内</span>
         <span><span class="dot d-neutral"></span>余裕あり</span>
         <span><span class="dot d-ok"></span>完了</span>
-        <span class="note">「詳細を編集」で物件名・依頼者・期限・日付を変更できます</span>
+        <span class="note">「詳細を編集」で物件名・依頼者・期限を変更可能です</span>
       </div>
 
       <div id="erimanCards"></div>
@@ -301,7 +314,6 @@ function computeSteps(createdDate, deadline){
   });
 }
 
-// --- ローカル自動保存・読み込み ---
 function loadData(){
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -313,6 +325,7 @@ function loadData(){
           t.createdDate = t.createdDate || todayISO();
           t.steps = computeSteps(t.createdDate, t.deadline);
         }
+        if(!t.comments) t.comments = [];
         t.steps.forEach(s=>{ if(!s.short){ const tpl = STEP_TEMPLATE.find(x=>x.key===s.key); s.short = tpl ? tpl.short : s.label; } });
         if(!t.memoItems){ t.memoItems = parseMemoItems(t.content); }
       });
@@ -457,6 +470,24 @@ function renderEriman(){
             <span class="chk"></span>${escapeHtml(m.text)}
           </button>`).join('')}
       </div>` : ''}
+      
+      <!-- コメント・ノート書き込みエリア -->
+      <div class="comment-section">
+        <div class="comment-list">
+          ${(t.comments && t.comments.length) ? t.comments.map((c, idx)=>`
+            <div class="comment-item">
+              <span class="c-time">${escapeHtml(c.time)}</span>
+              <span class="c-text">${escapeHtml(c.text)}</span>
+              <button class="c-del" data-id="${t.id}" data-c-idx="${idx}" title="削除">✕</button>
+            </div>
+          `).join('') : '<div style="font-size:11px;color:var(--ink-soft);padding:2px 0;">メモ・コメント履歴はありません</div>'}
+        </div>
+        <div class="comment-form">
+          <input type="text" class="comment-input" data-id="${t.id}" placeholder="進捗メモ・コメントを追加...">
+          <button class="comment-add-btn" data-id="${t.id}">追加</button>
+        </div>
+      </div>
+
       <details class="pc-detail">
         <summary></summary>
         <div class="detail-body">
@@ -475,6 +506,7 @@ function renderEriman(){
       </details>
     </div>`).join('');
 
+  // ステップクリック
   wrap.querySelectorAll('.step-chip').forEach(chip=>{
     chip.addEventListener('click', e=>{
       const btn = e.currentTarget;
@@ -485,6 +517,8 @@ function renderEriman(){
       saveData(); render();
     });
   });
+
+  // メモアイテムクリック
   wrap.querySelectorAll('.mc-chip').forEach(chip=>{
     chip.addEventListener('click', e=>{
       const btn = e.currentTarget;
@@ -494,6 +528,47 @@ function renderEriman(){
       saveData(); render();
     });
   });
+
+  // コメント追加イベント
+  const handleAddComment = (taskId, inputEl) => {
+    const text = inputEl.value.trim();
+    if(!text) return;
+    const task = data.erimanTasks.find(t=>t.id===taskId);
+    if(!task.comments) task.comments = [];
+    const now = new Date();
+    const timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    task.comments.push({ text: text, time: timeStr });
+    saveData(); render();
+  };
+
+  wrap.querySelectorAll('.comment-add-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const taskId = e.currentTarget.dataset.id;
+      const inputEl = wrap.querySelector(`.comment-input[data-id="${taskId}"]`);
+      handleAddComment(taskId, inputEl);
+    });
+  });
+
+  wrap.querySelectorAll('.comment-input').forEach(inp=>{
+    inp.addEventListener('keypress', e=>{
+      if(e.key === 'Enter'){
+        handleAddComment(e.currentTarget.dataset.id, e.currentTarget);
+      }
+    });
+  });
+
+  // コメント削除イベント
+  wrap.querySelectorAll('.c-del').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const taskId = e.currentTarget.dataset.id;
+      const cIdx = Number(e.currentTarget.dataset.cIdx);
+      const task = data.erimanTasks.find(t=>t.id===taskId);
+      task.comments.splice(cIdx, 1);
+      saveData(); render();
+    });
+  });
+
+  // 編集フォーム連動
   wrap.querySelectorAll('.property-input').forEach(inp=>{
     inp.addEventListener('change', e=>{
       const task = data.erimanTasks.find(t=>t.id===e.target.dataset.id);
@@ -543,7 +618,7 @@ function renderEriman(){
   });
   wrap.querySelectorAll('.del-eriman').forEach(b=>{
     b.addEventListener('click', e=>{
-      if(!confirm('この案件を削除しますか？')) return;
+      if(!confirm('この物件案件を削除しますか？')) return;
       data.erimanTasks = data.erimanTasks.filter(t=>t.id!==e.target.dataset.id);
       saveData(); render();
     });
@@ -563,7 +638,8 @@ document.getElementById('addErimanBtn').addEventListener('click', ()=>{
   data.erimanTasks.push({
     id:uid(), property, requester, content, deadline, createdDate,
     steps: computeSteps(createdDate, deadline),
-    memoItems: parseMemoItems(content)
+    memoItems: parseMemoItems(content),
+    comments: []
   });
   ['f-property','f-requester','f-deadline','f-content'].forEach(id=>document.getElementById(id).value='');
   saveData(); render();
@@ -688,6 +764,7 @@ document.getElementById('importFile').addEventListener('change', e=>{
       data = Object.assign({ erimanTasks:[], chakudenLog:[], csTasks:[] }, parsed);
       data.erimanTasks.forEach(t=>{
         if(!t.steps){ t.createdDate = t.createdDate || todayISO(); t.steps = computeSteps(t.createdDate, t.deadline); }
+        if(!t.comments) t.comments = [];
         if(!t.memoItems){ t.memoItems = parseMemoItems(t.content); }
       });
       saveData(); render();
